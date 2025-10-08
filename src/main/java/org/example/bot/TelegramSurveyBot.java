@@ -76,7 +76,7 @@ public class TelegramSurveyBot extends TelegramLongPollingBot {
         boolean added = community.addMember(user);
 
         if (added) {
-            sendText(chatId, "ברוך הבא, " + name + "! גודל הקהילה כעת: " + community.getSize());
+            sendText(chatId, "Welcome, " + name + "! Community size now: " + community.getSize());
             String announce = "📢 חבר חדש הצטרף: " + name + " (סה\"כ: " + community.getSize() + ")";
             broadcastToAllExcept(announce, chatId);
         } else {
