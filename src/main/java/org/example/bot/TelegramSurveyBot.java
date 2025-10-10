@@ -199,7 +199,7 @@ public class TelegramSurveyBot extends TelegramLongPollingBot {
         SurveyResult result = new SurveyResult(survey);
         StringBuilder sb = new StringBuilder("📊Survey results: ").append(survey.getId());
         for (Question q : survey.getQuestions()) {
-            sb.append("\n\nשאלה: ").append(q.getText());
+            sb.append("\n\nQuestion: ").append(q.getText());
             q.getResultsPercent().entrySet().stream()
                     .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
                     .forEach(e -> sb.append("\n - ").append(e.getKey()).append(": ").append(e.getValue()).append("%"));
