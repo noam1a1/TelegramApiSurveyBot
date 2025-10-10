@@ -46,7 +46,7 @@ public class SurveyManager {
 
         ChatGPTResponse res = gptService.sendMessage(prompt1);
         if (!res.isSuccess()) {
-            throw new IllegalStateException("כשל בקבלת שאלות מה-API: " + res.getErrorCode() + " " + res.getExtra());
+            throw new IllegalStateException("Failed to recieve questions from the API: " + res.getErrorCode() + " " + res.getExtra());
         }
 
         String jsonBlob = ResponseUtils.extractFirstJsonBlock(res.getExtra());
@@ -90,20 +90,20 @@ public class SurveyManager {
 
     private void validateCanCreate() {
         if (community.getSize() < BotConfig.MIN_MEMBERS) {
-            throw new IllegalStateException("נדרשים לפחות " + BotConfig.MIN_MEMBERS + " חברים בקהילה כדי לפתוח סקר");
+            throw new IllegalStateException("Required atleast " + BotConfig.MIN_MEMBERS + " members in community to open a survey");
         }
         if (community.hasActiveSurvey()) {
-            throw new IllegalStateException("יש כבר סקר פעיל. סגור אותו לפני יצירת חדש");
+            throw new IllegalStateException("There is an active survey, close it before creating a new one. ");
         }
     }
 
     private void validateQuestions(List<Question> questions) {
         if (questions == null || questions.isEmpty() || questions.size() > 3)
-            throw new IllegalArgumentException("סקר חייב להכיל 1–3 שאלות");
+            throw new IllegalArgumentException("Survey must contain 1-3 questions. ");
         for (Question q : questions) {
             int n = q.getOptions().size();
             if (n < 2 || n > 4)
-                throw new IllegalArgumentException("לכל שאלה חייבות להיות 2–4 אפשרויות");
+                throw new IllegalArgumentException("Each question must have 2-4 choices. ");
         }
     }
 }
