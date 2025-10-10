@@ -32,9 +32,9 @@ public class Community {
     }
 
     public void notifyAllMembers(String message) {
-        System.out.println("📢 הודעה לקהילה: " + message);
+        System.out.println("📢 Message to community: " + message);
         for (User user : members) {
-            System.out.println("נשלח ל-" + user.getName());
+            System.out.println("Sent to " + user.getName());
         }
     }
 
