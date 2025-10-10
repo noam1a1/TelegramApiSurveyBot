@@ -77,10 +77,10 @@ public class TelegramSurveyBot extends TelegramLongPollingBot {
 
         if (added) {
             sendText(chatId, "Welcome, " + name + "! Community size now: " + community.getSize());
-            String announce = "📢 חבר חדש הצטרף: " + name + " (סה\"כ: " + community.getSize() + ")";
+            String announce = "A new member has joined: " + name + " Total: " + community.getSize() + ")";
             broadcastToAllExcept(announce, chatId);
         } else {
-            sendText(chatId, "אתה כבר חבר בקהילה 🙂");
+            sendText(chatId, "You are already a member of the community! ");
         }
     }
 
@@ -91,23 +91,23 @@ public class TelegramSurveyBot extends TelegramLongPollingBot {
 
         Survey active = community.getActiveSurvey();
         if (active == null || !active.isActive()) {
-            answerCallback(callbackId, "⚠️ אין סקר פעיל.");
+            answerCallback(callbackId, "No active survey. ");
             return;
         }
 
         User u = findUser(userId);
         if (u == null) {
-            answerCallback(callbackId, "⚠️ אינך חבר בקהילה.");
+            answerCallback(callbackId, "You are not a member of the community. ");
             return;
         }
         if (u.hasVoted()) {
-            answerCallback(callbackId, "כבר הגשת תשובות לסקר זה 🙂");
+            answerCallback(callbackId, "You have already replied to this survey. ");
             return;
         }
 
         ParsedData parsed = parseCallback(data);
         if (parsed == null || !active.getId().equals(parsed.surveyId)) {
-            answerCallback(callbackId, "⚠️ קריאת כפתור לא תקפה.");
+            answerCallback(callbackId, "⚠️ Choice invalid.");
             return;
         }
 
@@ -115,28 +115,28 @@ public class TelegramSurveyBot extends TelegramLongPollingBot {
                 initEmptyAnswers(active.getQuestions().size()));
 
         if (parsed.qIndex < 0 || parsed.qIndex >= bucket.size()) {
-            answerCallback(callbackId, "⚠️ שאלה לא תקפה.");
+            answerCallback(callbackId, "Invalid question. ");
             return;
         }
         int maxOpt = active.getQuestions().get(parsed.qIndex).getOptions().size() - 1;
         if (parsed.optIndex < 0 || parsed.optIndex > maxOpt) {
-            answerCallback(callbackId, "⚠️ אפשרות לא תקפה.");
+            answerCallback(callbackId, "Invalid option. ");
             return;
         }
 
         bucket.set(parsed.qIndex, parsed.optIndex);
-        answerCallback(callbackId, "נבחרה אפשרות " + (parsed.optIndex + 1) + " בשאלה " + (parsed.qIndex + 1));
+        answerCallback(callbackId, " A choice has been made " + (parsed.optIndex + 1) + " in question " + (parsed.qIndex + 1));
 
         if (!bucket.contains(null)) {
             boolean ok = active.collectResponse(u, bucket);
             if (ok) {
-                sendText(userId, "תודה! התשובות נקלטו ✅");
+                sendText(userId, "Thank you! Answer recieved. ");
                 if (active.getResponses().size() == community.getSize()) {
                     surveyManager.closeSurveyIfOpen(active);
                     sendResultsToCreator(active);
                 }
             } else {
-                sendText(userId, "⚠️ לא ניתן להגיש כעת (אולי הסקר נסגר?)");
+                sendText(userId, "Can't submit answer now, maybe survey has closed. ");
             }
         }
     }
@@ -146,9 +146,9 @@ public class TelegramSurveyBot extends TelegramLongPollingBot {
 
         partialAnswers.clear();
 
-        String header = "📣 נפתח סקר חדש!\n" +
-                "⏱ זמן מענה עד " + autoCloseMinutes + " דקות.\n" +
-                "נא השיבו על כל השאלות (לחיצה על כפתור עבור כל שאלה).";
+        String header = "📣 A new survey has opened\n" +
+                "⏱ Answering time until " + autoCloseMinutes + " minutes.\n" +
+                "Please answer all questions (Press a button for each question.)";
 
         for (User u : community.getMembers()) {
             sendText(u.getTelegramId(), header);
@@ -197,7 +197,7 @@ public class TelegramSurveyBot extends TelegramLongPollingBot {
 
     private void sendResultsToCreator(Survey survey) {
         SurveyResult result = new SurveyResult(survey);
-        StringBuilder sb = new StringBuilder("📊 תוצאות הסקר: ").append(survey.getId());
+        StringBuilder sb = new StringBuilder("📊Survey results: ").append(survey.getId());
         for (Question q : survey.getQuestions()) {
             sb.append("\n\nשאלה: ").append(q.getText());
             q.getResultsPercent().entrySet().stream()
